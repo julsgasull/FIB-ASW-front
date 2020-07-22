@@ -1,0 +1,122 @@
+<div class="container">
+  <div class="row menu">
+    <div class="col-2 principal">
+      <span class="imageClass" (click)="redirectToNews()">
+        <img src="../../assets/images/logo.png" style="border: 1px white solid; height:25px; width:25px">
+      </span>
+      <span class="title" (click)="redirectToNews()"> Hacker News</span>
+    </div>
+    <div class="col-7 links">
+      <a class="link" (click)="redirectToNewest()">news</a>
+      <span class="space"> | </span>
+      <a class="link" *ngIf="logged; else notLoggedThreads" (click)="redirectToThreads(loggedUser.email)">threads</a>
+      <ng-template #notLoggedThreads>
+        <a class="link" (click)="redirectToLogin()">threads</a>
+      </ng-template>
+      <span class="space"> | </span>
+      <a class="link">past</a>
+      <span class="space"> | </span>
+      <a class="link">comment</a>
+      <span class="space"> | </span>
+      <a class="link" (click)="redirectToAskOnly()">ask</a>
+      <span class="space"> | </span>
+      <a class="link">show</a>
+      <span class="space"> | </span>
+      <a class="link">jobs</a>  
+      <span class="space"> | </span>    
+      <a class="link" *ngIf="logged; else notLoggedSubmit" (click)="redirectToSubmit()">submit</a>
+      <ng-template #notLoggedSubmit>
+        <a class="link" (click)="redirectToLogin()">submit</a>
+      </ng-template>
+    </div>
+    <div class="col-3 userinfo">
+      <span class="link" *ngIf="logged; else notLoggedUser">
+        <a (click)="redirectToUserInfo(loggedUser.email)">{{loggedUser.name}}</a> | 
+        <a (click)="logout()">logout</a>
+      </span>
+      <ng-template #notLoggedUser>
+        <a class="link" (click)="redirectToLogin()">login</a>
+      </ng-template>
+    </div>
+  </div>
+  <div class="row"> </div>
+  <div class="row content">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="row"><br></div>
+      <div class="row">
+        <div class="col-1 fieldname">user:</div>
+        <div class="col fieldvalue">{{requestedUser.name}}</div>
+      </div>
+      <div class="row">
+        <div class="col-1 fieldname">created:</div>
+        <div class="col fieldvalue">{{requestedUser.created_at | dateAgo}}</div>
+      </div>
+      <div class="row">
+        <div class="col-1 fieldname">karma:</div>
+        <div class="col fieldvalue">{{requestedUser.karma}}</div>
+      </div>
+      <div class="row">
+        <div class="col-1 fieldname">about:</div>
+        <div class="col fieldvalue" *ngIf="sameUser; else notSameUserAbout">
+          <textarea
+            style="border-radius:2em;"
+            type="textarea" 
+            class="form-control" 
+            id="about" 
+            formControlName="about"
+            placeholder= "{{ loggedUser.about }}"
+            name="about"
+          ></textarea>
+        </div>
+        <ng-template #notSameUserAbout>
+          <div class="col fieldvalue">{{requestedUser.about}}</div>
+        </ng-template>
+      </div>
+      <div class="row" *ngIf="sameUser">
+        <div class="col-1 fieldname">email:</div>
+        <div class="col fieldvalue">{{requestedUser.email}}</div>
+      </div>
+      <div class="row" *ngIf="sameUser">
+        <div class="col-1 fieldname">api key:</div>
+        <div class="col fieldvalue">{{requestedUser.api_key}}</div>
+      </div>
+      <div class="row">
+        <div class="col-1 fieldname"> </div>
+        <div class="col fieldvalue">
+          <u (click)="redirectToSubmitted(requestedUser.email)">submitted</u>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-1 fieldname"> </div>
+        <div class="col fieldvalue">
+          <u (click)="redirectToThreads(requestedUser.email)">comments</u>
+        </div>
+      </div>
+      <div class="row" *ngIf="sameUser">
+        <div class="col-1 fieldname"> </div>
+        <div class="col fieldvalue">
+          <u (click)="redirectToUpvotedSubmissions()">upvoted submissions</u>
+        </div>
+      </div>
+      <div class="row" *ngIf="sameUser">
+        <div class="col-1 fieldname"> </div>
+        <div class="col fieldvalue">
+          <u (click)="redirectToUpvotedComments()">upvoted comments</u> 
+        </div>
+      </div>
+      <div class="row"><br></div>
+      <div class="row" *ngIf="sameUser">
+        <div class="col-1 fieldname"> </div>
+        <div class="col fieldvalue">
+          <button class="actions submitbutton" type="submit" value="submit">update</button>  <!-- <%if (logged_in?) && current_user.id == @user.id %> -->        
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-1"> </div>
+        <div class="col fieldvalue" style="color:#F6F6F0">
+          Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the thread. You can also submit via bookmarklet.
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

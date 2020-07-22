@@ -1,0 +1,105 @@
+<div class="container">
+  <div class="row menu">
+    <div class="col-2 principal">
+      <span class="imageClass" (click)="redirectToNews()">
+        <img src="../../assets/images/logo.png" style="border: 1px white solid; height:25px; width:25px">
+      </span>
+      <span class="title" (click)="redirectToNews()"> Hacker News</span>
+    </div>
+    <div class="col-7 links">
+      <a class="link" (click)="redirectToNewest()">news</a>
+      <span class="space"> | </span>
+      <a class="link" style="color:#FFFFFF" *ngIf="logged; else notLoggedThreads" (click)="redirectToThreads(loggedUser.email)">threads</a>
+      <ng-template #notLoggedThreads>
+        <a class="link" (click)="redirectToLogin()">threads</a>
+      </ng-template>
+      <span class="space"> | </span>
+      <a class="link">past</a>
+      <span class="space"> | </span>
+      <a class="link">comment</a>
+      <span class="space"> | </span>
+      <a class="link" (click)="redirectToAskOnly()">ask</a>
+      <span class="space"> | </span>
+      <a class="link">show</a>
+      <span class="space"> | </span>
+      <a class="link">jobs</a>  
+      <span class="space"> | </span>    
+      <a class="link" *ngIf="logged; else notLoggedSubmit" (click)="redirectToSubmit()">submit</a>
+      <ng-template #notLoggedSubmit>
+        <a class="link" (click)="redirectToLogin()">submit</a>
+      </ng-template>
+    </div>
+    <div class="col-3 userinfo">
+      <span class="link" *ngIf="logged; else notLoggedUser">
+        <a (click)="redirectToUserInfo(loggedUser.email)">{{loggedUser.name}}</a> | 
+        <a (click)="logout()">logout</a>
+      </span>
+      <ng-template #notLoggedUser>
+        <a class="link" (click)="redirectToLogin()">login</a>
+      </ng-template>
+    </div>
+  </div>
+  <div class="row"> </div>
+  <div class="row content">
+    <div class="row" style="color:#F6F6F0;">.</div>
+    <ul *ngIf="numContributions > 0">
+      <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{ list: contributions }"></ng-container>
+    </ul>
+    <ng-template #recursiveListTmpl let-list="list">
+      <li *ngFor="let comment of list" class="commentlist">
+        <div class="row commentinfo">
+          <div class="col-1 vote">
+            <span *ngIf="logged; else notLoggedVote">
+              <span class="imageClass vote"  *ngIf="comment.isvoted; else notVoted" >
+                <img src="../../assets/images/downvote.png" (click)="unvote(comment.id)" style="height:10px; width:10px;">
+              </span>
+              <ng-template #notVoted>
+                <span class="imageClass vote">
+                  <img src="../../assets/images/upvote.png" (click)="vote(comment.id)" style="height:10px; width:10px;">
+                </span>          
+              </ng-template>
+            </span>
+            <ng-template #notLoggedVote>
+              <span class="imageClass vote">
+                <img src="../../assets/images/upvote.png" (click)="redirectToLogin()" style="height:10px; width:10px;">
+              </span> 
+            </ng-template>
+          </div>
+          <div class="col-11 commentinfo">
+            <div class="row commentdetails">
+              <div class="col commentdetailsitem">
+                <a (click)="redirectToUserInfo(comment.useremail)">{{comment.username}}</a>
+              </div>
+              <div class="col commentdetailsitem">&nbsp;</div>
+              <div class="col commentdetailsitem">
+                <a class="age" (click)="redirectToContributionInfo(comment.id)">
+                  {{comment.created_at | dateAgo}}
+                </a>
+              </div>
+            </div>
+            <div class="row commentcontent">
+              <div class="col">
+                {{comment.content}}
+              </div>
+            </div>
+            <div class="row">
+              <div *ngIf="logged; else notLoggedReply" class="col-2 reply">
+                <u (click)="redirectToReply(comment.id)">reply</u>
+              </div>
+              <ng-template #notLoggedReply>
+                <div class="col-2 reply">
+                  <u (click)="redirectToLogin()">reply</u>
+                </div>
+              </ng-template>
+              <div class="col-10" style="color:#F6F6F0">
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul *ngIf="comment.numcomments > 0" class="commentlist">
+          <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{ list: comment.comments }"></ng-container>
+        </ul>
+      </li>
+    </ng-template>
+  </div>
+</div>

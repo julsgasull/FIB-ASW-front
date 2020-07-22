@@ -1,0 +1,93 @@
+<div class="container">
+  <div class="row menu">
+    <div class="col principal">
+      <span class="imageClass" (click)="redirectToNews()">
+        <img src="../../assets/images/logo.png" style="border: 1px white solid; height:25px; width:25px">
+      </span>
+      <span class="title"> Submit</span>
+    </div>
+  </div>
+  <div class="row content">
+    <div class="row" style="color:#F6F6F0;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    <form [formGroup]="contributionForm" (ngSubmit)="onSubmit()">
+      <div class="row"><br></div>
+      <div class="row">
+        <div class="col-1 fieldname">title</div>
+        <div class="col"[ngClass]="{'has-error': isSubmitted === true && formControls.title.errors}">
+          <input
+            style="border-radius:2em;"
+            type="text" 
+            class="form-control" 
+            id="title" 
+            formControlName="title"
+            name="title"
+            required
+          >
+          <span *ngIf="isSubmitted && formControls.title.errors"> 
+            <div class="error-message" *ngIf="formControls.title.errors.required">Title can't be blank</div> 
+            <div class="error-message" *ngIf="formControls.title.errors.minlength">Title is too short (minimum is 4 characters)</div>
+          </span> 
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-1 fieldname">url</div>
+        <div class="col" [ngClass]="{'has-error': isSubmitted === true && formControls.url.errors}">
+          <input
+            style="border-radius:2em;"
+            type="text" 
+            class="form-control" 
+            id="url" 
+            formControlName="url"
+            name="url"
+          >
+          <span *ngIf="isSubmitted && formControls.url.errors"> 
+            <div class="error-message" *ngIf="formControls.url.errors.minlength">Url is too short (minimum is 4 characters)</div>
+            <div class="error-message" *ngIf="formControls.url.errors?.url">Url is invalid</div>
+          </span> 
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-1 fieldname">text</div>
+        <div class="col">
+          <input
+            style="border-radius:2em;"
+            type="textarea" 
+            class="form-control" 
+            id="content" 
+            formControlName="content"
+            name="content"
+          >
+        </div>
+      </div>
+      <div class="row"><br></div>
+      <div class="row error-message" *ngIf="isSubmitted && urlAndContent">
+        <div class="col-1" style="color:#F6F6F0">.</div>
+        <div class="col-11">
+          Error: <br>
+          Submissions can't have both urls and text, so you need to pick one. <br>
+          If you keep the url, you can always post your text as a comment in the thread.
+        </div>
+      </div>
+      <div class="row error-message" *ngIf="isSubmitted && niUrlNiContent">
+        <div class="col-1" style="color:#F6F6F0">.</div>
+        <div class="col-11">
+          Error: <br>
+          Please, fill in the url Xor the content field.
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-1" style="color:#F6F6F0">.</div>
+        <div class="col-11">
+          <button class="actions submitbutton" type="submit" value="submit">submit</button>
+        </div>
+      </div>
+      <div class="row"><br></div>
+      <div class="row">
+        <div class="col-1" style="color:#F6F6F0">.</div>
+        <div class="col-11">
+          Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the thread. You can also submit via <a href="https://news.ycombinator.com/bookmarklet.html" rel="nofollow"><u>bookmarklet</u></a>.
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

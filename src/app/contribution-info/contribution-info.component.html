@@ -1,0 +1,205 @@
+<div class="container">
+  <div class="row menu">
+    <div class="col-2 principal">
+      <span class="imageClass" (click)="redirectToNews()">
+        <img src="../../assets/images/logo.png" style="border: 1px white solid; height:25px; width:25px">
+      </span>
+      <span class="title" (click)="redirectToNews()"> Hacker News</span>
+    </div>
+    <div class="col-7 links">
+      <a class="link" (click)="redirectToNewest()">news</a>
+      <span class="space"> | </span>
+      <a class="link" *ngIf="logged; else notLoggedThreads" (click)="redirectToThreads(loggedUser.email)">threads</a>
+      <ng-template #notLoggedThreads>
+        <a class="link" (click)="redirectToLogin()">threads</a>
+      </ng-template>
+      <span class="space"> | </span>
+      <a class="link">past</a>
+      <span class="space"> | </span>
+      <a class="link">comment</a>
+      <span class="space"> | </span>
+      <a class="link" (click)="redirectToAskOnly()">ask</a>
+      <span class="space"> | </span>
+      <a class="link">show</a>
+      <span class="space"> | </span>
+      <a class="link">jobs</a>  
+      <span class="space"> | </span>    
+      <a class="link" *ngIf="logged; else notLoggedSubmit" (click)="redirectToSubmit()">submit</a>
+      <ng-template #notLoggedSubmit>
+        <a class="link" (click)="redirectToLogin()">submit</a>
+      </ng-template>
+    </div>
+    <div class="col-3 userinfo">
+      <span class="link" *ngIf="logged; else notLoggedUser">
+        <a (click)="redirectToUserInfo(loggedUser.email)">{{loggedUser.name}}</a> | 
+        <a (click)="logout()">logout</a>
+      </span>
+      <ng-template #notLoggedUser>
+        <a class="link" (click)="redirectToLogin()">login</a>
+      </ng-template>
+    </div>
+  </div>
+  <div class="row content">
+    <div class="col-12">
+      <div class="row" style="color:#F6F6F0;">.</div>
+      <div class="row contributioninfo">
+        <div class="col-1 vote">
+          <span *ngIf="logged; else notLoggedVote">
+            <span class="imageClass vote"  *ngIf="contribution.isvoted; else notVoted" >
+              <img src="../../assets/images/downvote.png" (click)="unvote(contribution.id)" style="height:10px; width:10px;">
+            </span>
+            <ng-template #notVoted>
+              <span class="imageClass vote">
+                <img src="../../assets/images/upvote.png" (click)="vote(contribution.id)" style="height:10px; width:10px;">
+              </span>          
+            </ng-template>
+          </span>
+          <ng-template #notLoggedVote>
+            <span class="imageClass vote">
+              <img src="../../assets/images/upvote.png" (click)="redirectToLogin()" style="height:10px; width:10px;">
+            </span> 
+          </ng-template>
+        </div>
+        <div class="col contributioninfo">
+          <div class="row contributiontitle">
+            <a *ngIf="contribution.c_type == &quot;ask&quot;; else notAsk" (click)="redirectToContributionInfo(contribution.id)">Ask HN: {{contribution.title}}</a>
+            <ng-template #notAsk>
+              <a href="{{contribution.url}}">{{contribution.title}}</a>
+            </ng-template>
+            <span *ngIf="contribution.c_type == &quot;url&quot;">
+              <a (click)="redirectToNews()">
+                <span class="sitestr">
+                  &nbsp;({{ (contribution.url.length>30)? (contribution.url | slice:0:30)+'...':(contribution.url) }})
+                </span>
+              </a>
+            </span>
+          </div>
+          <div class="row contributiondetails">
+            <div class="col contributiondetailsitem"><span class="score">{{contribution.vote}} points</span></div>
+            <div class="col contributiondetailsitem">&nbsp;</div>
+            <div class="col contributiondetailsitem">by</div>
+            <div class="col contributiondetailsitem">&nbsp;</div>
+            <div class="col contributiondetailsitem">
+              <a (click)="redirectToUserInfo(contribution.useremail)">{{contribution.username}}</a>
+            </div>
+            <div class="col contributiondetailsitem">&nbsp;</div>
+            <div class="col contributiondetailsitem">
+              <a class="age" (click)="redirectToContributionInfo(contribution.id)">
+                {{contribution.created_at | dateAgo}}
+              </a>
+            </div>
+            <div class="col contributiondetailsitem">&nbsp;|&nbsp;</div>
+            <div class="col contributiondetailsitem"><a>hide</a></div>
+            <div class="col contributiondetailsitem">&nbsp;|&nbsp;</div>
+            <div class="col contributiondetailsitem">
+              <a (click)="redirectToContributionInfo(contribution.id)">{{contribution.numcomments}} comments</a> <!-- falta nombre de comentaris -->
+            </div>
+            <div class="col contributiondetailsitem" *ngIf="logged && contribution.numcomments==0 && contribution.username==loggedUser.name">  <!-- and no té fills -->
+              &nbsp;|&nbsp;
+              <a (click)="delete(contribution.id)">delete</a>
+            </div>
+          </div>
+          <div *ngIf="contribution.content.length>0" class="row contributioncontent">
+            {{contribution.content}}
+          </div>
+        </div>
+      </div>
+      <div class="row commentbox" *ngIf="logged">
+        <form [formGroup]="commentForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <div class="col-1 fieldname"> </div>
+            <div class="col fieldvalue" style="color:#F6F6F0">.</div>
+          </div>
+          <div class="row">
+            <div class="col-1 fieldname"> </div>
+            <div class="col fieldvalue">
+              <textarea
+              style="border-radius:2em;"
+              type="textarea" 
+              class="form-control" 
+              id="comment" 
+              formControlName="comment"
+              placeholder= "leave your comment here"
+              name="comment"
+              ></textarea>
+            </div>
+          </div>
+          <div class="row" *ngIf="logged">
+            <div class="col-1 fieldname"> </div>
+            <div class="col fieldvalue">
+              <button class="actions submitbutton" type="submit" value="submit">comment</button>  <!-- <%if (logged_in?) && current_user.id == @user.id %> -->        
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-1 fieldname"> </div>
+            <div class="col fieldvalue" style="color:#F6F6F0">
+              Leave url blank to submit a question for discussion. If there is no url, the text (if any) will appear at the top of the thread. You can also submit via bookmarklet.
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="row" style="color:#F6F6F0;">.</div>
+      <div class="row comments">
+        <ul *ngIf="contribution.numcomments > 0">
+          <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{ list: contribution.comments }"></ng-container>
+        </ul>
+        <ng-template #recursiveListTmpl let-list="list">
+          <li *ngFor="let comment of list" class="commentlist">
+            <div class="row commentinfo">
+              <div class="col-1 vote">
+                <span *ngIf="logged; else notLoggedVote">
+                  <span class="imageClass vote"  *ngIf="comment.isvoted; else notVoted" >
+                    <img src="../../assets/images/downvote.png" (click)="unvote(comment.id)" style="height:10px; width:10px;">
+                  </span>
+                  <ng-template #notVoted>
+                    <span class="imageClass vote">
+                      <img src="../../assets/images/upvote.png" (click)="vote(comment.id)" style="height:10px; width:10px;">
+                    </span>          
+                  </ng-template>
+                </span>
+                <ng-template #notLoggedVote>
+                  <span class="imageClass vote">
+                    <img src="../../assets/images/upvote.png" (click)="redirectToLogin()" style="height:10px; width:10px;">
+                  </span> 
+                </ng-template>
+              </div>
+              <div class="col-11 commentinfo">
+                <div class="row commentdetails">
+                  <div class="col commentdetailsitem">
+                    <a (click)="redirectToUserInfo(comment.useremail)">{{comment.username}}</a>
+                  </div>
+                  <div class="col commentdetailsitem">&nbsp;</div>
+                  <div class="col commentdetailsitem">
+                    <a class="age" (click)="redirectToContributionInfo(comment.id)">
+                      {{comment.created_at | dateAgo}}
+                    </a>
+                  </div>
+                </div>
+                <div class="row commentcontent">
+                  <div class="col">
+                    {{comment.content}}
+                  </div>
+                </div>
+                <div class="row">
+                  <div *ngIf="logged; else notLoggedReply" class="col-2 reply">
+                    <u (click)="redirectToReply(comment.id)">reply</u>
+                  </div>
+                  <ng-template #notLoggedReply>
+                    <div class="col-2 reply">
+                      <u (click)="redirectToLogin()">reply</u>
+                    </div>
+                  </ng-template>
+                  <div class="col-10" style="color:#F6F6F0">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <ul *ngIf="comment.numcomments > 0" class="commentlist">
+              <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{ list: comment.comments }"></ng-container>
+            </ul>
+          </li>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
